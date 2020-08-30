@@ -1,18 +1,54 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class FireManager : MonoBehaviour
+namespace Assets.Scripts
 {
-    // Start is called before the first frame update
-    void Start()
+    public class FireManager : MonoBehaviour
     {
-        
-    }
+        public bool IsInitialized = false;
 
-    // Update is called once per frame
-    void Update()
-    {
+        private TreeManager _treeManager;
+
+        // Start is called before the first frame update
+        void Start()
+        {
+            var terrains = FindObjectsOfType<Terrain>();
+            if (terrains.Length == 0)
+            {
+                Debug.Log("No terrain tiles found, fire manager not initialized");
+                return;
+            }
+        }
+
+        public void Init(TreeManager treeManager)
+        {
+            _treeManager = treeManager;
+            IsInitialized = true;
+        }
+
+        // Update is called once per frame
+        void Update()
+        {
         
+        }
+
+        bool GetSimulationState()
+        {
+            return true;
+        }
+
+        public void StartSimulation()
+        {
+
+        }
+
+        public void StopSimulation()
+        {
+
+        }
+
+        public void ToggleSimulation()
+        {
+
+        }
     }
 }

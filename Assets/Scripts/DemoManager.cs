@@ -1,24 +1,62 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using Assets.Scripts.Enums;
 using UnityEngine;
 
-public class DemoManager : MonoBehaviour
+namespace Assets.Scripts
 {
-    // Start is called before the first frame update
-    void Start()
+    public class DemoManager : MonoBehaviour
     {
-        
-    }
+        private FireManager _fireManager;
+        private TreeManager _treeManager;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+        private InteractionMode _mode;
 
-    public void QuitDemo()
-    {
-        Debug.Log("Quitting");
-        Application.Quit(0);
+        // Start is called before the first frame update
+        void Start()
+        {
+            _treeManager = GetComponent<TreeManager>();
+            _fireManager = GetComponent<FireManager>();
+            if (_treeManager == null)
+            {
+                _treeManager = gameObject.AddComponent<TreeManager>();
+            }
+
+            if (_fireManager == null)
+            {
+                _fireManager = gameObject.AddComponent<FireManager>();
+            }
+
+            _fireManager.Init(_treeManager);
+        }
+
+        // Update is called once per frame
+        void Update()
+        {
+        
+        }
+
+        public void SetMode(int mode)
+        {
+            _mode = (InteractionMode)mode;
+
+            Debug.Log($"Set interaction mode to {_mode}");
+        }
+
+        public void StartFireSimulation()
+        {
+            Debug.Log("Starting fire sim");
+            _fireManager.StartSimulation();
+        }
+
+        public void StopFireSimulation()
+        {
+            Debug.Log("Stopping fire sim");
+            _fireManager.StopSimulation();
+        }
+
+        public void QuitDemo()
+        {
+            Debug.Log("Quitting");
+            Application.Quit(0);
+        }
     }
 }
