@@ -199,7 +199,7 @@ namespace Assets.Scripts.TreeHandling
         public void ReInit(TerrainTreeData data, bool restart = false)
         {
             StopSimulation();
-            ClearInitialTexture();
+            //ClearInitialTexture();
             _burntTreeBuffer.Dispose();
             Init(data);
             if (restart)
