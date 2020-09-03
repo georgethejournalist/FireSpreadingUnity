@@ -45,6 +45,8 @@ public class FreeLookCamera : MonoBehaviour
     /// </summary>
     private bool _looking = false;
 
+    public bool CanZoom = true;
+
     void Update()
     {
         var fastMode = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
@@ -97,11 +99,14 @@ public class FreeLookCamera : MonoBehaviour
             transform.localEulerAngles = new Vector3(newRotationY, newRotationX, 0f);
         }
 
-        float axis = Input.GetAxis("Mouse ScrollWheel");
-        if (axis != 0)
+        if (CanZoom)
         {
-            var zoomSensitivity = fastMode ? this.FastZoomSensitivity : this.ZoomSensitivity;
-            transform.position = transform.position + transform.forward * axis * zoomSensitivity;
+            float axis = Input.GetAxis("Mouse ScrollWheel");
+            if (axis != 0)
+            {
+                var zoomSensitivity = fastMode ? this.FastZoomSensitivity : this.ZoomSensitivity;
+                transform.position = transform.position + transform.forward * axis * zoomSensitivity;
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.Mouse1))
