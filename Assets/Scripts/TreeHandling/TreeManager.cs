@@ -543,7 +543,7 @@ namespace Assets.Scripts.TreeHandling
                 else
                 {
                     Debug.Log($"Found multiple tree nodes around the specified area through BVH check. Count: {nodes.Count}");
-                    // TODO find the closest through raw distance and return it
+                    
                     var twoDimWorldPos = new Vector2(worldPosition.x, worldPosition.z);
                     float minDist = Single.MaxValue;
                     foreach (var treeNode in nodes)
@@ -558,41 +558,6 @@ namespace Assets.Scripts.TreeHandling
 
                     return -1;
                 }
-            }
-
-            return -1;
-        }
-
-        public int FindTreeInstanceIndexAtPosition(Vector3 worldPosition)
-        {
-            var terrains = FindObjectsOfType<Terrain>();
-            if (terrains.Length == 0)
-            {
-                Debug.Log("No terrain tiles found, fire manager not initialized");
-                return -1;
-            }
-
-            foreach (var terrain in terrains)
-            {
-                // find if world position is in this terrain
-
-                // find the local position?
-                var local = TerrainUtils.WorldPositionToTerrain(worldPosition, terrain, out var belongsToTile);
-                if (!belongsToTile)
-                {
-                    continue;
-                }
-
-                // find the pixel in the tex?
-                var treeData = _terrainToTreeData[terrain];
-                var tex = treeData.TreeTexture;
-
-                var result = tex.GetPixel((int)local.x, (int)local.z);
-                if (result == Color.green)
-                {
-                    Debug.Log("It's a tree, mate");
-                }
-
             }
 
             return -1;
@@ -754,6 +719,7 @@ namespace Assets.Scripts.TreeHandling
                 }
 
                 ToggleTreeInstances(indices, IndexOfBurningPrototype, terrain);
+                terrain.Flush();
             }
         }
 
