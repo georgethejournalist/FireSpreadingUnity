@@ -236,14 +236,15 @@ namespace Assets.Scripts.TreeHandling
                 quadTree.Clear();
 
                 TerrainUtils.MassPlaceTreesOfPrototype(terrain.terrainData, count, IndexOfLivePrototype, Color.green);
-                
+                terrain.Flush();
+
                 var regenTreeData = PrepareTerrainTreeData(terrain);
                 regenTreeData.Handler = handler;
 
                 _terrainToTreeData[terrain] = regenTreeData;
                 _handlersToTreeData[handler] = regenTreeData;
 
-                handler.ReInit(treeData);
+                handler.ReInit(regenTreeData);
             }
         }
 
@@ -257,6 +258,7 @@ namespace Assets.Scripts.TreeHandling
                 var terrain = dataPair.Key;
                 var treeData = dataPair.Value;
                 terrain.terrainData.SetTreeInstances(new TreeInstance[0], false);
+                terrain.Flush();
 
                 var quadTree = treeData.QuadTree;
                 quadTree.Clear();
@@ -271,7 +273,7 @@ namespace Assets.Scripts.TreeHandling
                 _terrainToTreeData[terrain] = regenTreeData;
                 _handlersToTreeData[handler] = regenTreeData;
 
-                handler.ReInit(treeData);
+                handler.ReInit(regenTreeData);
             }
 
 
@@ -304,6 +306,7 @@ namespace Assets.Scripts.TreeHandling
             var treeData = _terrainToTreeData[terrain];
             treeData.QuadTree.Clear();
             treeData.Handler.ResetSimulation();
+            terrain.Flush();
         }
 
 
@@ -349,6 +352,8 @@ namespace Assets.Scripts.TreeHandling
 
             var handler = treeData.Handler;
             handler.MarkTreeLive(terrain.terrainData.GetTreeInstance(length));
+
+            terrain.Flush();
         }
 
         public void RemoveTreeUnderCursor(Vector3 worldPosition, Terrain terrain)
@@ -382,6 +387,8 @@ namespace Assets.Scripts.TreeHandling
             var treeData = _terrainToTreeData[terrain];
             var quadTree = treeData.QuadTree;
             quadTree.Remove(node);
+
+            terrain.Flush();
         }
 
         public void ToggleTreeStateUnderCursor(Vector3 worldPosition)
