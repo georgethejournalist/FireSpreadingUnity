@@ -1,0 +1,105 @@
+﻿// NOT NONE OF THESE SHADERS ARE OPTIMAL THEY ARE SIMPLE!!!
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+#pragma kernel CSInit
+#pragma kernel CSClean
+
+int TexRes;
+
+int WindDirDegrees;
+int WindSpeed;
+int NaturalFireSpreadSpeed;
+
+Texture2D<float4> Prev;
+RWTexture2D<float4> Result;
+RWStructuredBuffer<int2> BurntTrees;
+
+static const float PI = 3.14159265f;
+
+[numthreads(1, 1, 1)]
+void CSClean(uint3 id : SV_DispatchThreadID)
+{
+    int2 minVal = int2(0, 0);
+    for (int i = 0; i < TexRes * TexRes; i++)
+    {
+        BurntTrees[i] = minVal;
+    }    
+}
+
+
+[numthreads(8, 8, 1)]
+void CSInit(uint3 id : SV_DispatchThreadID)
+{
+    Result[id.xy] = Prev[id.xy];  
+}
+
+[numthreads(8, 8, 1)]
+void CSMain(uint3 id : SV_DispatchThreadID)
+{
+    float4 current = Prev[id.xy];
+    
+    float rads = WindDirDegrees / (180 * PI);
+    // get unit vector
+    float x = cos(rads);
+    float y = sin(rads);
+    
+    float green = current.g;
+    
+    float skipNonTrees = clamp(green, 0, 1);
+    
+    bool toggled = false;
+    
+    for (int j = 0; j < NaturalFireSpreadSpeed*skipNonTrees; j++)
+    {
+        //int leftX = id.x - j;
+        //int leftY = id.y;
+        //int rightX = id.x + j;
+        //int rightY = id.y;
+        bool aliveAtInit = current.r < 0.5 && current.g > 0.5;
+        
+        float4 left = Prev[float2(id.x - j, id.y)];
+        float4 right = Prev[float2(id.x + j, id.y)];
+        float4 top = Prev[float2(id.x, id.y - j)];
+        float4 bottom = Prev[float2(id.x, id.y + j)];
+        
+        // should make this one firey if any of the neighbours are on fire and this one has foliage
+        current.r = clamp(left.r + right.r + top.r + bottom.r, 0, 1) * current.g;
+        //current.r = clamp((left.r + right.r + top.r + bottom.r) * current.g, 0, 1);
+        
+        if (aliveAtInit && current.r > 0.5)
+        {
+            toggled = true;
+        }
+    }
+    
+    
+    for (int i = 0; i < (NaturalFireSpreadSpeed + WindSpeed) * skipNonTrees; i++)
+    {
+        bool aliveAtInit = current.r < 0.5 && current.g > 0.5;
+        // this would affect the pixel in the path of the wind
+        int prevX = id.x - i * x;
+        int prevY = id.y - i * y;
+        
+        float4 prevPix = Prev[float2(prevX, prevY)];
+        
+        // should make this one firey if the previous pixel in the path of the wind has fire and this one has foliage
+        if (prevPix.r > 0 && current.g > 0 && current.r < 1)
+        {
+            current.r = 1;
+        }
+        
+        if (aliveAtInit && current.r > 0.5)
+        {
+            toggled = true;
+        }
+    }
+    
+    if (toggled)
+    {
+        int oneDIndex = id.x + (id.y * TexRes);
+        BurntTrees[oneDIndex] = id.xy;
+    }
+    
+    //Result[id.xy] = float4(r + (a.r * 0.4), a.g + (r * 0.4) - (1 - r), r, r);
+    Result[id.xy] = current;
+}
