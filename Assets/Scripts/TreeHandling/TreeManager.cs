@@ -180,8 +180,9 @@ namespace Assets.Scripts.TreeHandling
         {
             var tex = GetTerrainTreesToTexture(terrain);
 
-            TextureUtils.SaveTexture(tex, $"{Application.dataPath}/Terrains/TreeSplatmaps");
-
+#if DEBUG
+            TextureUtils.SaveTexture(tex, $"{Application.dataPath}/Resources/TreeSplatmaps");
+#endif
             var treeData = new TerrainTreeData();
             treeData.TreeTexture = tex;
             treeData.Terrain = terrain;
@@ -621,14 +622,6 @@ namespace Assets.Scripts.TreeHandling
             return tex;
         }
 
-        public void SaveTextureWithDialog(Texture2D tex)
-        {
-            string path = EditorUtility.SaveFolderPanel("Choose a directory to save the alpha maps:", "", "");
-            path = path.Replace(Application.dataPath, "Assets");
-
-            TextureUtils.SaveTexture(tex, path);
-        }
-
         private void OnNewBurntTreesReported(object sender, BurntTreesEventArgs e)
         {
             var handler = sender as FireHandler;
@@ -709,17 +702,18 @@ namespace Assets.Scripts.TreeHandling
 
         void OnDrawGizmos()
         {
-            if (DrawQuadTreeForSelectedTerrain)
-            {
-                var terrain = Selection.activeGameObject?.GetComponent<Terrain>();
+#if DEBUG
+            //if (DrawQuadTreeForSelectedTerrain)
+            //{
+            //    var terrain = Selection.activeGameObject?.GetComponent<Terrain>();
 
-                if (terrain != null && _terrainToTreeData.ContainsKey(terrain))
-                {
-                    var treeData = _terrainToTreeData[terrain];
-                    treeData.QuadTree?.DrawDebug();
-                }
-            }
-
+            //    if (terrain != null && _terrainToTreeData.ContainsKey(terrain))
+            //    {
+            //        var treeData = _terrainToTreeData[terrain];
+            //        treeData.QuadTree?.DrawDebug();
+            //    }
+            //}
+#endif
             if (DrawLastCheckedPosition && _lastCheckedPosition != Vector3.zero)
             {
                 var prevColor = Gizmos.color;

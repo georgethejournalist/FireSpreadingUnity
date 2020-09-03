@@ -7,12 +7,17 @@ namespace Assets.Scripts.Utils
     public static class TextureUtils
     {
 
-        public static void SaveTexture(Texture2D tex, string path)
+        public static void SaveTexture(Texture2D tex, string directoryPath)
         {
-            if (String.IsNullOrEmpty(path))
+            if (String.IsNullOrEmpty(directoryPath))
             {
                 Debug.LogError("Trying to save texture to undefined path.");
                 return;
+            }
+
+            if (!System.IO.Directory.Exists(directoryPath))
+            {
+                System.IO.Directory.CreateDirectory(directoryPath);
             }
 
             var pngData = tex.EncodeToPNG();
@@ -22,7 +27,7 @@ namespace Assets.Scripts.Utils
                 return;
             }
 
-            File.WriteAllBytes(path + "/" + tex.name + ".png", pngData);
+            File.WriteAllBytes(directoryPath + "/" + tex.name + ".png", pngData);
         }
 
         /// <summary>
